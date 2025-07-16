@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дашборд по Показателям</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2c3e50;
+        }
+        .chart-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .chart-container h2 {
+            text-align: center;
+            color: #34495e;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-header">
+        <h1>Дашборд Аналитики</h1>
+        <p>Динамика ключевых показателей по месяцам</p>
+    </div>
+
+    <div class="chart-container">
+        <h2>Динамика Продаж</h2>
+        <canvas id="salesChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Динамика Визитов на Сайт и Записей</h2>
+        <canvas id="webTrafficRegistrationsChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Динамика Конверсии</h2>
+        <canvas id="conversionChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Динамика Среднего Чека (за последние 3 месяца)</h2>
+        <canvas id="avgCheckChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Динамика Первичных Визитов (за последние 3 месяца)</h2>
+        <canvas id="primaryVisitsChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Динамика Повторных Визитов (за последние 3 месяца)</h2>
+        <canvas id="repeatVisitsChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Динамика Всего Визитов (за последние 3 месяца)</h2>
+        <canvas id="totalVisitsChart"></canvas>
+    </div>
+
+    <script>
+        const data = [
+            { "Месяц": "июнь", "Продажи": "1 076 353", "Средний чек": "", "Первичные визиты": "", "Повторные визиты": "", "Всего визитов": "", "Визиты на сайт": "", "Записи с сайта": "", "Конверсия": "" },
+            { "Месяц": "июль", "Продажи": "1 039 556", "Средний чек": "", "Первичные визиты": "", "Повторные визиты": "", "Всего визитов": "", "Визиты на сайт": 369, "Записи с сайта": "", "Конверсия": "" },
+            { "Месяц": "август", "Продажи": "1 038 491", "Средний чек": "", "Первичные визиты": "", "Повторные визиты": "", "Всего визитов": "", "Визиты на сайт": 483, "Записи с сайта": "", "Конверсия": "" },
+            { "Месяц": "сентябрь", "Продажи": "838 347", "Средний чек": "", "Первичные визиты": "", "Повторные визиты": "", "Всего визитов": "", "Визиты на сайт": 531, "Записи с сайта": "", "Конверсия": "" },
+            { "Месяц": "октябрь", "Продажи": "1 482 389", "Средний чек": "", "Первичные визиты": "", "Повторные визиты": "", "Всего визитов": "", "Визиты на сайт": 608, "Записи с сайта": "", "Конверсия": "" },
+            { "Месяц": "ноябрь", "Продажи": "1 514 491", "Средний чек": "", "Первичные визиты": "", "Повторные визиты": "", "Всего визитов": "", "Визиты на сайт": 514, "Записи с сайта": "", "Конверсия": "" },
+            { "Месяц": "декабрь", "Продажи": "1 836 549", "Средний чек": "", "Первичные визиты": "", "Повторные визиты": "", "Всего визитов": "", "Визиты на сайт": 569, "Записи с сайта": "", "Конверсия": "" },
+            { "Месяц": "январь", "Продажи": "1 309 847", "Средний чек": "", "Первичные визиты": "", "Повторные визиты": "", "Всего визитов": "", "Визиты на сайт": 736, "Записи с сайта": 4, "Конверсия": "0,54" },
+            { "Месяц": "февраль", "Продажи": "1 668 441", "Средний чек": "", "Первичные визиты": "", "Повторные визиты": "", "Всего визитов": "", "Визиты на сайт": 756, "Записи с сайта": 17, "Конверсия": "2,25" },
+            { "Месяц": "март", "Продажи": "2 105 638", "Средний чек": "", "Первичные визиты": "", "Повторные визиты": "", "Всего визитов": "", "Визиты на сайт": 848, "Записи с сайта": 29, "Конверсия": "3,42" },
+            { "Месяц": "апрель", "Продажи": "2 424 000", "Средний чек": 5873, "Первичные визиты": 137, "Повторные визиты": 309, "Всего визитов": 446, "Визиты на сайт": 892, "Записи с сайта": 42, "Конверсия": "4,71" },
+            { "Месяц": "май", "Продажи": "3 185 295", "Средний чек": 6754, "Первичные визиты": 247, "Повторные визиты": 300, "Всего визитов": 547, "Визиты на сайт": 1686, "Записи с сайта": 49, "Конверсия": "2,91" },
+            { "Месяц": "июнь", "Продажи": "2 908 695", "Средний чек": 7129, "Первичные визиты": 211, "Повторные визиты": 322, "Всего визитов": 533, "Визиты на сайт": 1454, "Записи с сайта": 63, "Конверсия": "4,33" }
+        ];
+
+        const months = data.map(item => item['Месяц']);
+
+        function cleanNumber(str) {
+            if (typeof str === 'string') {
+                return parseFloat(str.replace(/\s/g, '').replace(',', '.')) || null;
+            }
+            return parseFloat(str) || null;
+        }
+
+        // Продажи
+        const salesData = data.map(item => cleanNumber(item['Продажи']));
+        new Chart(document.getElementById('salesChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Продажи',
+                    data: salesData,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Сумма Продаж'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Объединенный график: Визиты на Сайт и Записи с Сайта
+        const websiteVisitsData = data.map(item => cleanNumber(item['Визиты на сайт']));
+        const siteRegistrationsData = data.map(item => cleanNumber(item['Записи с сайта']));
+
+        new Chart(document.getElementById('webTrafficRegistrationsChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Визиты на Сайт',
+                        data: websiteVisitsData,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        tension: 0.1,
+                        fill: false,
+                        yAxisID: 'y-visits'
+                    },
+                    {
+                        label: 'Записи с Сайта',
+                        data: siteRegistrationsData,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.1,
+                        fill: false,
+                        yAxisID: 'y-registrations'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    'y-visits': {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Количество Визитов'
+                        }
+                    },
+                    'y-registrations': {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                        title: {
+                            display: true,
+                            text: 'Количество Записей'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Конверсия (отдельно)
+        const conversionData = data.map(item => cleanNumber(item['Конверсия']));
+        new Chart(document.getElementById('conversionChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Конверсия (%)',
+                    data: conversionData,
+                    borderColor: 'rgb(255, 205, 86)',
+                    backgroundColor: 'rgba(255, 205, 86, 0.2)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Процент Конверсии'
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- Изменения ниже для среза по 3 месяцам с данными ---
+
+        // Отфильтруем данные для показателей с частичными значениями (средний чек, визиты)
+        // Судя по вашим данным, это последние 3 месяца: апрель, май, июнь.
+        const filteredDataForVisits = data.filter(item => item['Месяц'] === 'апрель' || item['Месяц'] === 'май' || item['Месяц'] === 'июнь');
+        const filteredMonthsForVisits = filteredDataForVisits.map(item => item['Месяц']);
+
+        // Средний Чек (за последние 3 месяца)
+        const avgCheckDataFiltered = filteredDataForVisits.map(item => cleanNumber(item['Средний чек']));
+        new Chart(document.getElementById('avgCheckChart'), {
+            type: 'line',
+            data: {
+                labels: filteredMonthsForVisits,
+                datasets: [{
+                    label: 'Средний Чек',
+                    data: avgCheckDataFiltered,
+                    borderColor: 'rgb(153, 102, 255)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Сумма Среднего Чека'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Первичные Визиты (за последние 3 месяца)
+        const primaryVisitsDataFiltered = filteredDataForVisits.map(item => cleanNumber(item['Первичные визиты']));
+        new Chart(document.getElementById('primaryVisitsChart'), {
+            type: 'line',
+            data: {
+                labels: filteredMonthsForVisits,
+                datasets: [{
+                    label: 'Первичные Визиты',
+                    data: primaryVisitsDataFiltered,
+                    borderColor: 'rgb(201, 203, 207)',
+                    backgroundColor: 'rgba(201, 203, 207, 0.2)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Количество Первичных Визитов'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Повторные Визиты (за последние 3 месяца)
+        const repeatVisitsDataFiltered = filteredDataForVisits.map(item => cleanNumber(item['Повторные визиты']));
+        new Chart(document.getElementById('repeatVisitsChart'), {
+            type: 'line',
+            data: {
+                labels: filteredMonthsForVisits,
+                datasets: [{
+                    label: 'Повторные Визиты',
+                    data: repeatVisitsDataFiltered,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Количество Повторных Визитов'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Всего Визитов (за последние 3 месяца)
+        const totalVisitsDataFiltered = filteredDataForVisits.map(item => cleanNumber(item['Всего визитов']));
+        new Chart(document.getElementById('totalVisitsChart'), {
+            type: 'line',
+            data: {
+                labels: filteredMonthsForVisits,
+                datasets: [{
+                    label: 'Всего Визитов',
+                    data: totalVisitsDataFiltered,
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Общее Количество Визитов'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
