@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Дашборд по продажам и маркетингу</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif; /* Изменено на Manrope */
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .chart-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 30px;
+        }
+        h2 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Дашборд по продажам и маркетингу</h1>
+    <div class="dashboard-container">
+        <div class="chart-card">
+            <h2>Продажи по месяцам</h2>
+            <canvas id="salesChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h2>Визиты на сайт</h2>
+            <canvas id="websiteVisitsChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h2>Записи с сайта</h2>
+            <canvas id="websiteRecordsChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h2>Конверсия</h2>
+            <canvas id="conversionChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h2>Зарплаты маркетинг</h2>
+            <canvas id="marketingSalariesChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h2>Реклама Яндекс</h2>
+            <canvas id="yandexAdsChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h2>Whatsapp расходы</h2>
+            <canvas id="whatsappChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h2>ПроДокторов расходы</h2>
+            <canvas id="proDoctorsChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h2>Расходы на Программиста</h2>
+            <canvas id="programmerChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const data = [
+            { "Месяц": "июнь", "Продажи": "1 076 353", "Визиты на сайт": "", "Записи с сайта": "", "Конверсия": "", "Зарплаты маркетинг": "р.30 000", "Реклама Яндекс": "", "Whatsapp": "", "ПроДокторов": "", "Программист": "" },
+            { "Месяц": "июль", "Продажи": "1 039 556", "Визиты на сайт": 369, "Записи с сайта": "", "Конверсия": "", "Зарплаты маркетинг": "р.30 000", "Реклама Яндекс": "", "Whatsapp": "", "ПроДокторов": "", "Программист": "" },
+            { "Месяц": "август", "Продажи": "1 038 491", "Визиты на сайт": 483, "Записи с сайта": "", "Конверсия": "", "Зарплаты маркетинг": "р.30 000", "Реклама Яндекс": "", "Whatsapp": "", "ПроДокторов": "", "Программист": "" },
+            { "Месяц": "сентябрь", "Продажи": "838 347", "Визиты на сайт": 531, "Записи с сайта": "", "Конверсия": "", "Зарплаты маркетинг": "р.30 000", "Реклама Яндекс": "", "Whatsapp": "", "ПроДокторов": "", "Программист": "" },
+            { "Месяц": "октябрь", "Продажи": "1 482 389", "Визиты на сайт": 608, "Записи с сайта": "", "Конверсия": "", "Зарплаты маркетинг": "р.30 000", "Реклама Яндекс": "", "Whatsapp": "", "ПроДокторов": "", "Программист": "" },
+            { "Месяц": "ноябрь", "Продажи": "1 514 491", "Визиты на сайт": 514, "Записи с сайта": "", "Конверсия": "", "Зарплаты маркетинг": "р.30 000", "Реклама Яндекс": "", "Whatsapp": "", "ПроДокторов": "", "Программист": "" },
+            { "Месяц": "декабрь", "Продажи": "1 836 549", "Визиты на сайт": 569, "Записи с сайта": "", "Конверсия": "", "Зарплаты маркетинг": "р.30 000", "Реклама Яндекс": "", "Whatsapp": "", "ПроДокторов": "", "Программист": "" },
+            { "Месяц": "январь", "Продажи": "1 309 847", "Визиты на сайт": 736, "Записи с сайта": 4, "Конверсия": "0,54", "Зарплаты маркетинг": "р.60 000", "Реклама Яндекс": "р.12 500", "Whatsapp": "", "ПроДокторов": "", "Программист": "" },
+            { "Месяц": "февраль", "Продажи": "1 668 441", "Визиты на сайт": 756, "Записи с сайта": 17, "Конверсия": "2,25", "Зарплаты маркетинг": "р.60 000", "Реклама Яндекс": "р.12 500", "Whatsapp": "", "ПроДокторов": "", "Программист": "" },
+            { "Месяц": "март", "Продажи": "2 105 638", "Визиты на сайт": 848, "Записи с сайта": 29, "Конверсия": "3,42", "Зарплаты маркетинг": "р.60 000", "Реклама Яндекс": "р.12 500", "Whatsapp": "", "ПроДокторов": "", "Программист": "" },
+            { "Месяц": "апрель", "Продажи": "2 424 000", "Визиты на сайт": 892, "Записи с сайта": 42, "Конверсия": "4,71", "Зарплаты маркетинг": "р.60 000", "Реклама Яндекс": "р.12 500", "Whatsapp": "р.2 500", "ПроДокторов": "р.5 000", "Программист": "" },
+            { "Месяц": "май", "Продажи": "3 185 295", "Визиты на сайт": 1686, "Записи с сайта": 49, "Конверсия": "2,91", "Зарплаты маркетинг": "р.60 000", "Реклама Яндекс": "р.12 500", "Whatsapp": "р.2 500", "ПроДокторов": "р.5 000", "Программист": "р.40 000" },
+            { "Месяц": "июнь", "Продажи": "2 908 695", "Визиты на сайт": 1454, "Записи с сайта": 63, "Конверсия": "4,33", "Зарплаты маркетинг": "р.60 000", "Реклама Яндекс": "р.12 500", "Whatsapp": "р.2 500", "ПроДокторов": "р.5 000", "Программист": "" }
+        ];
+
+        const labels = data.map(item => item["Месяц"]);
+
+        // Helper function to clean and parse monetary values
+        function parseCurrency(value) {
+            if (typeof value === 'string') {
+                return parseFloat(value.replace(/р\.\s?/, '').replace(/\s/g, '').replace(',', '.')) || 0;
+            }
+            return parseFloat(value) || 0;
+        }
+
+        // Helper function to clean and parse number values
+        function parseNumber(value) {
+            if (typeof value === 'string') {
+                return parseFloat(value.replace(/\s/g, '').replace(',', '.')) || 0;
+            }
+            return parseFloat(value) || 0;
+        }
+
+        // Sales Chart
+        new Chart(document.getElementById('salesChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Продажи (₽)',
+                    data: data.map(item => parseCurrency(item["Продажи"])),
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Сумма (₽)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Месяц'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Website Visits Chart
+        new Chart(document.getElementById('websiteVisitsChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Визиты на сайт',
+                    data: data.map(item => parseNumber(item["Визиты на сайт"])),
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Количество'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Месяц'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Website Records Chart
+        new Chart(document.getElementById('websiteRecordsChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Записи с сайта',
+                    data: data.map(item => parseNumber(item["Записи с сайта"])),
+                    borderColor: 'rgb(54, 162, 235)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Количество'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Месяц'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Conversion Chart
+        new Chart(document.getElementById('conversionChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Конверсия (%)',
+                    data: data.map(item => parseNumber(item["Конверсия"])),
+                    borderColor: 'rgb(255, 205, 86)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Процент (%)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Месяц'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Marketing Salaries Chart
+        new Chart(document.getElementById('marketingSalariesChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Зарплаты маркетинг (₽)',
+                    data: data.map(item => parseCurrency(item["Зарплаты маркетинг"])),
+                    borderColor: 'rgb(153, 102, 255)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Сумма (₽)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Месяц'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Yandex Ads Chart
+        new Chart(document.getElementById('yandexAdsChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Реклама Яндекс (₽)',
+                    data: data.map(item => parseCurrency(item["Реклама Яндекс"])),
+                    borderColor: 'rgb(255, 159, 64)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Сумма (₽)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Месяц'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Whatsapp Chart
+        new Chart(document.getElementById('whatsappChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Whatsapp расходы (₽)',
+                    data: data.map(item => parseCurrency(item["Whatsapp"])),
+                    borderColor: 'rgb(75, 192, 0)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Сумма (₽)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Месяц'
+                        }
+                    }
+                }
+            }
+        });
+
+        // ProDoctors Chart
+        new Chart(document.getElementById('proDoctorsChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'ПроДокторов расходы (₽)',
+                    data: data.map(item => parseCurrency(item["ПроДокторов"])),
+                    borderColor: 'rgb(200, 50, 100)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Сумма (₽)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Месяц'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Programmer Chart
+        new Chart(document.getElementById('programmerChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Расходы на Программиста (₽)',
+                    data: data.map(item => parseCurrency(item["Программист"])),
+                    borderColor: 'rgb(100, 100, 200)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Сумма (₽)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Месяц'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
